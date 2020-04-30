@@ -1,0 +1,215 @@
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+
+\documentclass[spanish,$fontsize$, a4paper]{article}
+
+% LAYOUT   
+%--------------------------------
+\usepackage{geometry} 
+\geometry{$geometry$}
+
+% No page numbers
+\pagenumbering{gobble}
+
+% Left align
+\usepackage[document]{ragged2e}
+
+$if(letterhead)$
+  % To include the letterhead
+  \usepackage{wallpaper}
+  \ULCornerWallPaper{1}{letterhead.pdf}
+$endif$
+
+\usepackage{moresize} % Provides more font size commands (\HUGE and \ssmall)
+
+\renewcommand*\familydefault{\sfdefault}
+
+% TYPOGRAPHY
+%--------------------------------
+\usepackage{fontspec} 
+\usepackage{xunicode}
+\usepackage{xltxtra}
+
+% converts LaTeX specials (quotes, dashes etc.) to Unicode
+\defaultfontfeatures{Mapping=tex-text}
+%\setromanfont [Ligatures={Common}, Numbers={OldStyle}]{$seriffont$}
+%\setsansfont[Scale=0.9]{$sansfont$}
+
+% Set paragraph break
+\setlength{\parskip}{1em}
+
+% Custom ampersand
+\newcommand{\amper}{{\fontspec[Scale=.95]{$seriffont$}\selectfont\itshape\&}}
+
+%$if(seriffont)$
+%\setmainfont[SmallCapsFeatures={LetterSpace=5,Letters=SmallCaps}]{$seriffont$}
+%$endif$
+%$if(sansfont)$
+%    \setsansfont{$sansfont$}
+%$endif$
+
+% Command required by how Pandoc handles the list conversion
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% TABLE CUSTOMIZATION
+%--------------------------------
+\usepackage{spreadtab}
+\usepackage[default]{raleway}
+\usepackage[compact]{titlesec} % For customizing title sections
+\titlespacing*{\section}{0pt}{3pt}{-7pt} % Remove margin bottom from the title
+\usepackage{arydshln} % For the dotted line on the table
+\renewcommand{\arraystretch}{1.5} % Apply vertical padding to table cells
+\usepackage{hhline} % For single-cell borders
+\usepackage{enumitem} % For customizing lists
+\setlist{nolistsep} % No whitespace around list items
+\setlist[itemize]{leftmargin=0.5cm} % Reduce list left indent
+\setlength{\tabcolsep}{9pt} % Larger gutter between columns
+\usepackage{datetime}
+
+% LANGUAGE
+%--------------------------------
+$if(lang)$
+\usepackage{polyglossia}
+\setmainlanguage{$lang$}
+$endif$
+
+% PDF SETUP
+%--------------------------------
+\usepackage[xetex, bookmarks, colorlinks, breaklinks]{hyperref}
+\hypersetup
+{
+  pdfauthor={$from.name$},
+  pdfsubject=Invoice Nr. $invoice-nr$,
+  pdftitle=Invoice Nr. $invoice-nr$,
+  linkcolor=blue,
+  citecolor=blue,
+  filecolor=black,
+  urlcolor=blue
+}
+
+% To display custom date
+% \usepackage[nodayofweek]{datetime}
+% \newdate{date}{01}{12}{1867}
+% \date{\displaydate{date}}
+% Use this instead of \today: % \displaydate{date}
+
+% DOCUMENT
+%--------------------------------
+\begin{document}
+%\small
+%
+%\textbf{$author$}
+%$for(from)$
+%	\textbullet{} $from$
+%$endfor$
+$from_name$
+{\HUGE \textbf{$from_name$}}\\ % First name
+
+\hspace{10pt}
+
+\textbf{$description$} \\
+
+\hspace{10pt}
+
+Factura \# {\twodigit{\the\day}}{\twodigit{\the\month}}{\the\year}
+\hfill
+Factura emitida el {\twodigit{\the\day}} de {\shortmonthname} de {\the\year}
+
+\hspace{10pt}
+
+ \begin{minipage}[t]{0.5\textwidth}
+    \begin{flushleft}
+    
+    \colorbox{black}{{\textcolor{white}{\textbf{Emitido por}}}}
+    \vspace{5pt}
+    
+		$from_name$\\
+		\vspace{3pt}
+		NIF: $NIF$\\
+		\vspace{3pt}
+    	
+    
+        $from_email$\\
+        		\vspace{3pt}
+        
+
+		$from_address$\\
+				\vspace{3pt}
+
+		$from_city$
+				\vspace{3pt}
+    \end{flushleft}
+\end{minipage}%
+%
+\begin{minipage}[t]{0.5\textwidth}
+    \begin{flushright}
+    
+\colorbox{black}{{\textcolor{white}{\textbf{Facturado a}}}}
+\vspace{5pt}
+
+		$client_name$\\
+		\vspace{3pt}
+	CIF: $NIF_client$\\
+			\vspace{3pt}
+
+	
+	     $client_email$\\
+		\vspace{3pt}
+
+	$client_address$\\
+		\vspace{3pt}
+
+	$client_city$
+			\vspace{3pt}
+    \end{flushright}
+\end{minipage}%
+
+\vspace{1em}
+
+\footnotesize
+\newcounter{pos}
+\setcounter{pos}{0}
+\STautoround*{2}
+$if(commasep)$\STsetdecimalsep{,}$endif$ % Use comma as decimal separator
+
+\begin{spreadtab}{{tabular}[t t t t t]{lp{5.2cm}rrr}}
+  \hdashline[1pt/1pt]
+  % HEADER
+  @ \noalign{\vskip 2mm} \textbf{Item} & @ \textbf{Descripción} & @ \textbf{Precio ($currency$)} & @ \textbf{IVA $VAT$\%} & @ \textbf{IRPF $IRPF$\%} \\ \hline
+    $for(service)$ @ \noalign{\vskip 2mm} \refstepcounter{pos} \thepos
+        & @ $service.description$
+        % If it has subtasks add them in a bullet list
+        $if(service.details)$\newline
+            \begin{itemize}
+            $for(service.details)$\scriptsize
+                \item $service.details$
+            $endfor$ \end{itemize}
+        $endif$ & $service.price$ & :={$service.price$/100*$VAT$} & :={$service.price$/100*$IRPF$}\\
+    $endfor$ \noalign{\vskip 2mm} \hline
+    $if(VAT)$
+        @ & @ \multicolumn{1}{r}{Subtotal:} & :={sum(c1:[0,-1])} \\ \hhline{~~-}
+        @ & @ \multicolumn{1}{r}{IVA $VAT$\%:} & $VAT$/100*[0,-1] \\ \hhline{~~-}
+        @ & @ \multicolumn{1}{r}{IRPF $IRPF$\%:} & $IRPF$/100*[0,-2] \\ \hhline{~~-}
+    $endif$
+    @ & @ \multicolumn{1}{r}{\textbf{Total:}}
+    & \textbf{:={[0,-3]+[0,-2]-[0,-1]}} \\ \hhline{~~-}
+\end{spreadtab}
+
+Por favor, realice la transferencia en un período inferior a $payback$ días:
+
+\begin{itemize}
+	\item $bank_name$ 
+	\item IBAN: $IBAN$
+\end{itemize}
+
+
+\vspace{15mm}
+
+\sffamily
+\small
+$closingnote$
+
+\medskip
+
+\end{document}
