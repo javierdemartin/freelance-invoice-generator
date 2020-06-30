@@ -24,7 +24,6 @@ bank_name: Imaginary Bank
 is_foreign_client: false
 local_currency: €
 exange_rate: 0.89
-BIC: PBNKDEFF
 IBAN: Bank account number 
 payback: 30
 billed_currency: €
