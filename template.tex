@@ -104,7 +104,7 @@ $endif$
 %	\textbullet{} $from$
 %$endfor$
 $from_name$
-{\HUGE \textbf{$from_name$}}\\ % First name
+{\Large \textbf{$from_name$}}\\ % First name
 
 \hspace{10pt}
 
@@ -112,16 +112,16 @@ $from_name$
 
 \hspace{10pt}
 
-Factura \# {\twodigit{\the\day}}{\twodigit{\the\month}}{\the\year}
+Invoice \# {\twodigit{\the\year}}{\twodigit{\the\month}}{\the\day}
 \hfill
-Factura emitida el {\twodigit{\the\day}} de {\shortmonthname} de {\the\year}
+Billed on {\twodigit{\the\day}}/{\shortmonthname}/{\the\year}
 
 \hspace{10pt}
 
  \begin{minipage}[t]{0.5\textwidth}
     \begin{flushleft}
     
-    \colorbox{black}{{\textcolor{white}{\textbf{Emitido por}}}}
+    \colorbox{black}{{\textcolor{white}{\textbf{Billed by}}}}
     \vspace{5pt}
     
 		$from_name$\\
@@ -145,13 +145,16 @@ Factura emitida el {\twodigit{\the\day}} de {\shortmonthname} de {\the\year}
 \begin{minipage}[t]{0.5\textwidth}
     \begin{flushright}
     
-\colorbox{black}{{\textcolor{white}{\textbf{Facturado a}}}}
+\colorbox{black}{{\textcolor{white}{\textbf{Billed to}}}}
 \vspace{5pt}
 
 		$client_name$\\
 		\vspace{3pt}
-	CIF: $NIF_client$\\
+      $if(NIF_client)$
+    $NIF_client$\\
 			\vspace{3pt}
+  $endif$
+
 
 	
 	     $client_email$\\
@@ -176,7 +179,7 @@ $if(commasep)$\STsetdecimalsep{,}$endif$ % Use comma as decimal separator
 \begin{spreadtab}{{tabular}[t t t t t]{lp{5.2cm}rrr}}
   \hdashline[1pt/1pt]
   % HEADER
-  @ \noalign{\vskip 2mm} \textbf{Item} & @ \textbf{Descripción} & @ \textbf{Precio ($currency$)} & @ \textbf{IVA $VAT$\%} & @ \textbf{IRPF $IRPF$\%} \\ \hline
+  @ \noalign{\vskip 2mm} \textbf{Item} & @ \textbf{Description} & @ \textbf{Price ($billed_currency$)} & @ \textbf{VAT $VAT$\%} & @ \textbf{IRPF $IRPF$\%} \\ \hline
     $for(service)$ @ \noalign{\vskip 2mm} \refstepcounter{pos} \thepos
         & @ $service.description$
         % If it has subtasks add them in a bullet list
@@ -192,15 +195,22 @@ $if(commasep)$\STsetdecimalsep{,}$endif$ % Use comma as decimal separator
         @ & @ \multicolumn{1}{r}{IVA $VAT$\%:} & $VAT$/100*[0,-1] \\ \hhline{~~-}
         @ & @ \multicolumn{1}{r}{IRPF $IRPF$\%:} & $IRPF$/100*[0,-2] \\ \hhline{~~-}
     $endif$
-    @ & @ \multicolumn{1}{r}{\textbf{Total:}}
-    & \textbf{:={[0,-3]+[0,-2]-[0,-1]}} \\ \hhline{~~-}
+    @ & @ \multicolumn{1}{r}{\textbf{Total} ($billed_currency$):} & \textbf{:={[0,-3]+[0,-2]-[0,-1]}} \\ \hhline{~~-}
+    $if(is_foreign_client)$
+    @ & @ \multicolumn{1}{r}{Total ($local_currency$): }           & [0,-1]*$exange_rate$ \\ \hhline{~~-}
+    $endif$
 \end{spreadtab}
 
-Por favor, realice la transferencia en un período inferior a $payback$ días:
+$if(is_foreign_client)$
+Money exange rate calculated at: $exange_rate$ $billed_currency$/$local_currency$.
+$endif$
+
+
+Please, deposit the specified amount into the following bank account:
 
 \begin{itemize}
 	\item $bank_name$ 
-	\item IBAN: $IBAN$
+	\item Account number: $IBAN$
 \end{itemize}
 
 

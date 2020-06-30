@@ -1,0 +1,33 @@
+---
+fontsize: 10pt
+geometry: a4paper, left=43mm, right=43mm, top=51mm, bottom=17mm
+from_name: Your name or company 
+from_address: Street 
+from_city: City 
+from_email: thiscouldbe@youremail.com 
+from_phone: (+xx) xxx xx xx xx
+description: What do you do for work? 
+client_name: Your client name 
+client_address: Your client's address 
+client_city: Your client's city 
+client_email: yourclients@email.com
+VAT: 21
+IRPF: 7
+NIF: Your ID number
+NIF_client: Also ID for the client if needed
+service:
+- description: Task description
+  price: 100.0
+  details:
+    - Task details 
+bank_name: Imaginary Bank 
+is_foreign_client: false
+local_currency: €
+exange_rate: 0.89
+BIC: PBNKDEFF
+IBAN: Bank account number 
+payback: 30
+billed_currency: €
+commasep: true
+lang: english
+---
